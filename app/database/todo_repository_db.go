@@ -10,7 +10,7 @@ import (
 )
 
 type TodoRepository interface {
-	CreateTodo(ctx context.Context, createTodoRequest *models.CreateTodoRequestDataBase) error
+	CreateTodo(ctx context.Context, createTodoRequest *models.CreateTodoRequest) error
 }
 
 type TodoRepositoryDB struct {
@@ -23,7 +23,7 @@ func NewTodoRepositoryDB(pool *pgxpool.Pool) TodoRepository {
 	}
 }
 
-func (r *TodoRepositoryDB) CreateTodo(ctx context.Context, createTodoRequest *models.CreateTodoRequestDataBase) error {
+func (r *TodoRepositoryDB) CreateTodo(ctx context.Context, createTodoRequest *models.CreateTodoRequest) error {
 	tx, err := r.pool.Begin(ctx)
 	if err != nil {
 		return err

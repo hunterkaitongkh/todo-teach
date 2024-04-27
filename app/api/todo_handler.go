@@ -31,12 +31,7 @@ func (h *TodoHandler) CreateTodo(ctx *fiber.Ctx) error {
 		return models.Response(constants.StatusCodeBadRequest, nil, constants.BadRequestMessage).SendResponse(ctx, http.StatusBadRequest)
 	}
 
-	createTodoData := &models.CreateTodoRequestDataBase{
-		TodoName: request.TodoName,
-		IsCheck:  request.IsCheck,
-	}
-
-	if err := h.todoRepository.CreateTodo(ctx.Context(), createTodoData); err != nil {
+	if err := h.todoRepository.CreateTodo(ctx.Context(), request); err != nil {
 		return models.Response(constants.StatusCodeSystemError, nil, constants.StatusCodeSystemErrorMessage).SendResponse(ctx, http.StatusInternalServerError)
 	}
 	return models.ResponseSuccess(constants.StatusCodeSuccess, constants.SuccessMessage, nil).SendResponseSuccess(ctx, http.StatusOK)
