@@ -11,6 +11,7 @@ import (
 
 type TodoRepository interface {
 	CreateTodo(ctx context.Context, createTodoRequest *models.CreateTodoRequest) error
+	ReadTodo(ctx context.Context) (*[]models.ResponseReadTodo, error)
 }
 
 type TodoRepositoryDB struct {
@@ -50,4 +51,37 @@ func (r *TodoRepositoryDB) CreateTodo(ctx context.Context, createTodoRequest *mo
 	}
 
 	return err
+}
+
+func (r *TodoRepositoryDB) ReadTodo(ctx context.Context) (*[]models.ResponseReadTodo, error) {
+	query := "SELECT tl.id, tl.todo_name, tl.is_check FROM todo_list tl"
+
+	rows, err := r.pool.Query(ctx, query)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var responseReadTodoList []models.ResponseReadTodo
+	for rows.Next() {
+		var responseReadTodo models.ResponseReadTodo
+		err := rows.Scan(
+			&responseReadTodo.ID,
+			&responseReadTodo.TodoName,
+			&responseReadTodo.IsCheck,
+		)
+		if err != nil {
+			return nil, err
+		}
+		responseReadTodoList = append(responseReadTodoList, responseReadTodo)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+
+	if len(responseReadTodoList) == 0 {
+		return &[]models.ResponseReadTodo{}, nil
+	}
+
+	return &responseReadTodoList, nil
 }

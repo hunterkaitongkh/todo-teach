@@ -1,6 +1,7 @@
 package api
 
 import (
+	"log"
 	"net/http"
 	"todo/models"
 
@@ -35,4 +36,15 @@ func (h *TodoHandler) CreateTodo(ctx *fiber.Ctx) error {
 		return models.Response(constants.StatusCodeSystemError, nil, constants.StatusCodeSystemErrorMessage).SendResponse(ctx, http.StatusInternalServerError)
 	}
 	return models.ResponseSuccess(constants.StatusCodeSuccess, constants.SuccessMessage, nil).SendResponseSuccess(ctx, http.StatusOK)
+}
+
+func (h *TodoHandler) ReadTodo(ctx *fiber.Ctx) error {
+
+	data, err := h.todoRepository.ReadTodo(ctx.Context())
+	if err != nil {
+		log.Println(err.Error())
+		return models.Response(constants.StatusCodeSystemError, nil, constants.StatusCodeSystemErrorMessage).SendResponse(ctx, http.StatusInternalServerError)
+	}
+
+	return models.ResponseSuccess(constants.StatusCodeSuccess, constants.SuccessMessage, data).SendResponseSuccess(ctx, http.StatusOK)
 }

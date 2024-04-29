@@ -37,6 +37,8 @@ func main() {
 	todoHandler := api.NewTodoHandler(database.NewTodoRepositoryDB(postgresClient))
 
 	app.Post("/create-todo", todoHandler.CreateTodo)
+	app.Get("/read-todo", todoHandler.ReadTodo)
+
 	healthCheck(app, postgresClient)
 
 	log.Printf("Listening on port: %s", cfg.Server.Port)
