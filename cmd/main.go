@@ -37,7 +37,9 @@ func main() {
 	todoHandler := api.NewTodoHandler(database.NewTodoRepositoryDB(postgresClient))
 
 	app.Post("/create-todo", todoHandler.CreateTodo)
-	app.Get("/read-todo", todoHandler.ReadTodo)
+	app.Post("/read-todo", todoHandler.ReadTodo)
+	app.Post("/update-todo", todoHandler.UpdateTodo)
+	app.Delete("/delete-todo", todoHandler.DeleteTodo)
 
 	healthCheck(app, postgresClient)
 

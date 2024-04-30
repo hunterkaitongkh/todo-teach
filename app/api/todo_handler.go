@@ -39,12 +39,52 @@ func (h *TodoHandler) CreateTodo(ctx *fiber.Ctx) error {
 }
 
 func (h *TodoHandler) ReadTodo(ctx *fiber.Ctx) error {
-
-	data, err := h.todoRepository.ReadTodo(ctx.Context())
+	request := new(models.ReadTodoRequest)
+	if err := ctx.BodyParser(&request); err != nil {
+		return models.Response(constants.StatusCodeBadRequest, constants.BadRequestMessage, err.Error()).SendResponse(ctx, http.StatusBadRequest)
+	}
+	validate := validator.New()
+	if err := validate.Struct(request); err != nil {
+		return models.Response(constants.StatusCodeBadRequest, nil, constants.BadRequestMessage).SendResponse(ctx, http.StatusBadRequest)
+	}
+	data, err := h.todoRepository.ReadTodo(ctx.Context() ,request)
+	
 	if err != nil {
 		log.Println(err.Error())
 		return models.Response(constants.StatusCodeSystemError, nil, constants.StatusCodeSystemErrorMessage).SendResponse(ctx, http.StatusInternalServerError)
 	}
 
 	return models.ResponseSuccess(constants.StatusCodeSuccess, constants.SuccessMessage, data).SendResponseSuccess(ctx, http.StatusOK)
+}
+
+func (h *TodoHandler) UpdateTodo(ctx *fiber.Ctx) error {
+	request := new(models.UpdateTodoRequest)
+	if err := ctx.BodyParser(&request); err != nil {
+		return models.Response(constants.StatusCodeBadRequest, constants.BadRequestMessage, err.Error()).SendResponse(ctx, http.StatusBadRequest)
+	}
+	validate := validator.New()
+	if err := validate.Struct(request); err != nil {
+		return models.Response(constants.StatusCodeBadRequest, nil, constants.BadRequestMessage).SendResponse(ctx, http.StatusBadRequest)
+	}
+
+	if err := h.todoRepository.UpdateTodo(ctx.Context(), request); err != nil {
+		return models.Response(constants.StatusCodeSystemError, nil, constants.StatusCodeSystemErrorMessage).SendResponse(ctx, http.StatusInternalServerError)
+	}
+	return models.ResponseSuccess(constants.StatusCodeSuccess, constants.SuccessMessage, nil).SendResponseSuccess(ctx, http.StatusOK)
+}
+
+func (h *TodoHandler) DeleteTodo(ctx *fiber.Ctx) error {
+	request := new(models.DeleteTodoRequest)
+	if err := ctx.BodyParser(&request); err != nil {
+		return models.Response(constants.StatusCodeBadRequest, constants.BadRequestMessage, err.Error()).SendResponse(ctx, http.StatusBadRequest)
+	}
+	validate := validator.New()
+	if err := validate.Struct(request); err != nil {
+		return models.Response(constants.StatusCodeBadRequest, nil, constants.BadRequestMessage).SendResponse(ctx, http.StatusBadRequest)
+	}
+
+	if err := h.todoRepository.DeleteTodo(ctx.Context(), request); err != nil {
+		return models.Response(constants.StatusCodeSystemError, nil, constants.StatusCodeSystemErrorMessage).SendResponse(ctx, http.StatusInternalServerError)
+	}
+	return models.ResponseSuccess(constants.StatusCodeSuccess, constants.SuccessMessage, nil).SendResponseSuccess(ctx, http.StatusOK)
 }
